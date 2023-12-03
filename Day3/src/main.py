@@ -70,6 +70,47 @@ def bottom_right(i, indexes, rows, numeric=False):
         return rows[i+1][max(indexes)+1] != '.'
 
 
+
+def get_adjacent_numbers(i, index, rows):
+    if i == 0:
+        start = 0
+    else:
+        start = i - 1
+
+    if i == len(rows) - 1:
+        end = i
+    else:
+        end = i + 1
+
+    numbers = []
+    row_i = start
+    while row_i <= end:
+        row = rows[row_i]
+
+        indexes = []
+        number = ''
+
+        j = 0
+        while j < len(row):
+            if row[j].isnumeric():
+                number += row[j]
+                indexes.append(j)
+            else:
+                if number.isnumeric():
+                    if index - 1 in indexes or index in indexes or index + 1 in indexes:
+                        numbers.append(int(number))
+                number = ''
+                indexes = []
+            j += 1
+
+        if number.isnumeric():
+            if index - 1 in indexes or index in indexes or index + 1 in indexes:
+                numbers.append(int(number))
+
+        row_i += 1
+
+    return numbers
+
 def part1(input_list):
     input_list = input_list.split('\n')
 
@@ -121,31 +162,17 @@ def part2(input_list):
         j = 0
         while j < len(row):
             if row[j] == '*':
-                    if left(i, [j], input_list, numeric=True) \
-                            or right(i, [j], input_list, numeric=True) \
-                            or top(i, [j], input_list, numeric=True) \
-                            or bottom(i, [j], input_list, numeric=True) \
-                            or top_left(i, [j], input_list, numeric=True) \
-                            or top_right(i, [j], input_list, numeric=True) \
-                            or bottom_left(i, [j], input_list, numeric=True) \
-                            or bottom_right(i, [j], input_list, numeric=True):
-                        adjacent_numbers = get_adjacent_numbers(i, [j], input_list)
-                        if len(adjacent_numbers) == 2:
-                            ratios.append(adjacent_numbers[0] * adjacent_numbers[1])
+                if left(i, [j], input_list, numeric=True) \
+                        or right(i, [j], input_list, numeric=True) \
+                        or top(i, [j], input_list, numeric=True) \
+                        or bottom(i, [j], input_list, numeric=True) \
+                        or top_left(i, [j], input_list, numeric=True) \
+                        or top_right(i, [j], input_list, numeric=True) \
+                        or bottom_left(i, [j], input_list, numeric=True) \
+                        or bottom_right(i, [j], input_list, numeric=True):
+                    adjacent_numbers = get_adjacent_numbers(i, j, input_list)
+                    if len(adjacent_numbers) == 2:
+                        ratios.append(adjacent_numbers[0] * adjacent_numbers[1])
             j += 1
-
-        # Handle the edge
-        if row[j] == '*':
-            if left(i, [j], input_list, numeric=True) \
-                    or right(i, [j], input_list, numeric=True) \
-                    or top(i, [j], input_list, numeric=True) \
-                    or bottom(i, [j], input_list, numeric=True) \
-                    or top_left(i, [j], input_list, numeric=True) \
-                    or top_right(i, [j], input_list, numeric=True) \
-                    or bottom_left(i, [j], input_list, numeric=True) \
-                    or bottom_right(i, [j], input_list, numeric=True):
-                adjacent_numbers = get_adjacent_numbers(i, [j], input_list)
-                if len(adjacent_numbers) == 2:
-                    ratios.append(adjacent_numbers[0] * adjacent_numbers[1])
 
     return sum(ratios)
