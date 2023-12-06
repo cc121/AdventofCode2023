@@ -31,7 +31,7 @@ def get_map_and_map(i, input_list, data_to_map):
                         min_key = key
 
                 if min_key is not None:
-                    result.append(f"{dtm_lower}-{dtm_lower+min_dist-1}")
+                    result.append(f"{dtm_lower}-{min(dtm_upper, dtm_lower+min_dist-1)}")
                     dtm_lower += min_dist
                 else:
                     result.append(f"{dtm_lower}-{dtm_upper}")
