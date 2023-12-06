@@ -1,5 +1,3 @@
-import re
-
 def get_map_and_map(i, input_list, data_to_map):
     data = {}
     while i < len(input_list) and input_list[i] != '':
@@ -12,16 +10,33 @@ def get_map_and_map(i, input_list, data_to_map):
 
     result = []
     for dtm in data_to_map:
-        for key, val in data.items():
-            lower, upper = [int(bound) for bound in key.split('-')]
-            if dtm >= lower and dtm <= upper:
-                value_range = dtm - lower
-                result.append(val['start'] + value_range)
-                break
-        else:
-            result.append(dtm)
-    i += 2
+        dtm_lower, dtm_upper = [int(dtm_val) for dtm_val in dtm.split('-')]
+        while dtm_lower <= dtm_upper:
+            for key, val in data.items():
+                lower, upper = [int(bound) for bound in key.split('-')]
+                if lower <= dtm_lower <= upper:
+                    start = val['start']
+                    start_range = abs(lower - dtm_lower)
+                    end_range = min(dtm_upper, upper) - dtm_lower
+                    result.append(f"{start+start_range}-{start+start_range+end_range}")
+                    dtm_lower += end_range + 1
+                    break
+            else:
+                min_dist = float('inf')
+                min_key = None
+                for key in data.keys():
+                    lower, upper = [int(val) for val in key.split('-')]
+                    if dtm_lower <= lower and lower - dtm_lower < min_dist:
+                        min_dist = lower - dtm_lower
+                        min_key = key
 
+                if min_key is not None:
+                    result.append(f"{dtm_lower}-{dtm_lower+min_dist-1}")
+                    dtm_lower += min_dist
+                else:
+                    result.append(f"{dtm_lower}-{dtm_upper}")
+                    dtm_lower = dtm_upper + 1
+    i += 2
     return i, result
 
 
@@ -30,7 +45,7 @@ def part1(input_list):
 
     # Get seeds
     i = 0
-    seeds = [int(val) for val in input_list[i][7:].split(' ')]
+    seeds = [f"{val}-{val}" for val in input_list[i][7:].split(' ')]
     i += 3
 
     # Get seed to soil map
@@ -54,6 +69,7 @@ def part1(input_list):
     # Get humidity to location map
     i, locations = get_map_and_map(i, input_list, humidity)
 
+    locations = [int(val.split('-')[0]) for val in locations]
     return min(locations)
 
 
@@ -71,8 +87,6 @@ def part2(input_list):
         seed_range = seed_data[j+1]
         seeds.append(f"{seed_start}-{seed_start+seed_range-1}")
 
-    print(seeds)
-
     # Get seed to soil map
     i, soils = get_map_and_map(i, input_list, seeds)
 
@@ -94,4 +108,6 @@ def part2(input_list):
     # Get humidity to location map
     i, locations = get_map_and_map(i, input_list, humidity)
 
+    locations = [int(val.split('-')[0]) for val in locations]
     return min(locations)
+
