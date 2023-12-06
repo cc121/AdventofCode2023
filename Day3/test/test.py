@@ -49,7 +49,7 @@ class MyTestCase(unittest.TestCase):
         rows = [
             '.....',
             '.....',
-            '.123.',
+            '.123*',
             '.....',
             '.....',
         ]
